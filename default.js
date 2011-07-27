@@ -1,4 +1,9 @@
+function require(file, callback) {
+	include('http://localhost:3131/'+file+'.js', callback);
+}
+
 function include(url, callback) {
+	callback = callback || $.noop;
 	$.ajax({
 		url: url,
 		dataType: 'text',
