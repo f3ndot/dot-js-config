@@ -8,7 +8,7 @@ window.HighlightStatus = {
 		case 'In Testing':
 			return 'blue';
 		case 'Rejected':
-			return 'blue';
+			return 'black';
 		case 'New':
 		case 'Assigned':
 		default:
