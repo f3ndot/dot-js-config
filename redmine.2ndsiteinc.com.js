@@ -31,6 +31,11 @@ window.HighlightStatus = {
 			setTimeout(colorRows, 1000);
 			setTimeout(colorRows, 2000);
 		});
+		$('#query_form .buttons a').click(function() {
+			setTimeout(colorRows,  500);
+			setTimeout(colorRows, 1000);
+			setTimeout(colorRows, 2000);
+		});
 		
 		colorRows();
 	},
@@ -57,15 +62,14 @@ window.HighlightStatus = {
 
 (function($) {
 	var url_mapping = [ {
-		'regex':/^\/projects\/(\w*)\/issues(.*)/, // 'http://redmine.2ndsiteinc.com/projects/freshapp/issues?query_id=281',
+		'regex':/^\/projects\/(\w*)\/issues(.*)/, // example: 'http://redmine.2ndsiteinc.com/projects/freshapp/issues?query_id=281',
 		'msg':'Issue Search Results',
 		'func':HighlightStatus.colorIndexRows
 	}, {
-		'regex':/^\/issues\/(\d*)/, // 'http://redmine.2ndsiteinc.com/issues/11831'
+		'regex':/^\/issues\/(\d*)/, // example: 'http://redmine.2ndsiteinc.com/issues/11831'
 		'msg':'Single Issue',
 		'func':HighlightStatus.colorSingleIssue
 	} ];
-	
 	
 	$(document).ready(function() {
 		for(var i in url_mapping) {
