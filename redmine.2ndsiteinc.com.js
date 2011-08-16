@@ -45,6 +45,12 @@ window.HighlightStatus = {
 			'backgroundColor':HighlightStatus.getStatusColor(status.innerText),
 			'color':'white'
 		});
+		$('#relations table tr td:nth-child(2)').each(function() {
+			$(this).css({
+				'color':HighlightStatus.getStatusColor($(this).text()),
+				'fontWeight': 'bold'
+			});
+		});
 		include('/plugin_assets/redmine_statusboard/javascripts/strftime.js', function() {
 			$.getJSON('/statusboard/versions', function(data) {
 				console.debug(data);
