@@ -63,6 +63,22 @@ window.HighlightStatus = {
 				}
 			});
 		});
+	},
+	colorProjectSearch:function() {
+		var colorRows = function() {
+			$('#search-results dt a').each(function() {
+				var status = $(this).text().match(/\w+ #\d+ \((\w+)\)\:/);
+				$(this).css({
+					'color': HighlightStatus.getStatusColor(status[1])
+				});
+			});
+		}
+		$('#main').delegate('center a', 'click', function() {
+			setTimeout(colorRows,  500);
+			setTimeout(colorRows, 1000);
+			setTimeout(colorRows, 2000);
+		});
+		colorRows();
 	}
 };
 
@@ -75,6 +91,10 @@ window.HighlightStatus = {
 		'regex':/^\/issues\/(\d*)/, // example: 'http://redmine.2ndsiteinc.com/issues/11831'
 		'msg':'Single Issue',
 		'func':HighlightStatus.colorSingleIssue
+	}, {
+		'regex':/^\/search\/index\/(.*)/,
+		'msg':'Project Search Results',
+		'func':HighlightStatus.colorProjectSearch
 	} ];
 	
 	$(document).ready(function() {
