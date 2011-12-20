@@ -79,6 +79,22 @@ window.HighlightStatus = {
 			setTimeout(colorRows, 2000);
 		});
 		colorRows();
+	},
+	colorReleaseSchedule:function() {
+		var mapping = {
+			'a' : '', // anything not matched below will be given the default color
+			'a.status-1': 'New',
+			'a.status-3': 'Resolved',
+			'a.status-4': 'Reopened',
+			'a.status-5': 'In Testing',
+			'a.status-6': 'Closed',
+			'a.status-7': 'Rejected',
+			'a.status-8': 'Deployed'
+		},
+		rows = $('.related-issues li');
+		for(var selector in mapping) {
+			rows.find(selector).parent().css('color', HighlightStatus.getStatusColor(mapping[selector]));
+		}
 	}
 };
 
@@ -95,7 +111,12 @@ window.HighlightStatus = {
 		'regex':/^\/search\/index\/(.*)/,
 		'msg':'Project Search Results',
 		'func':HighlightStatus.colorProjectSearch
-	} ];
+	}, {
+		'regex':/^\/versions\/show\/(.*)/,
+		'msg':'Release Schedule',
+		'func':HighlightStatus.colorReleaseSchedule
+	}
+	];
 	
 	$(document).ready(function() {
 		for(var i in url_mapping) {
