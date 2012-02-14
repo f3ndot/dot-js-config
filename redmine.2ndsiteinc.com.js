@@ -112,7 +112,7 @@ window.HighlightStatus = {
 		'msg':'Project Search Results',
 		'func':HighlightStatus.colorProjectSearch
 	}, {
-		'regex':/^\/versions\/show\/(.*)/,
+		'regex':/^\/versions\/show\/(.*)|\/projects\/(.+)\/roadmap/,
 		'msg':'Release Schedule',
 		'func':HighlightStatus.colorReleaseSchedule
 	}
