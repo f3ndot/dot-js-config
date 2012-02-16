@@ -15,6 +15,18 @@ window.HighlightStatus = {
 			return 'red';
 		}
 	},
+	getClassMapping: function() {
+		return {
+			'a' : '', // anything not matched below will be given the default color
+			'a.status-1': 'New',
+			'a.status-3': 'Resolved',
+			'a.status-4': 'Reopened',
+			'a.status-5': 'In Testing',
+			'a.status-6': 'Closed',
+			'a.status-7': 'Rejected',
+			'a.status-8': 'Deployed'
+		};
+	},
 	colorIndexRows:function() {
 		var colorRows = function() {
 			console.debug('coloring the rows');
@@ -45,12 +57,7 @@ window.HighlightStatus = {
 			'backgroundColor':HighlightStatus.getStatusColor(status.innerText),
 			'color':'white'
 		});
-		$('#relations table tr td:nth-child(2)').each(function() {
-			$(this).css({
-				'color':HighlightStatus.getStatusColor($(this).text()),
-				'fontWeight': 'bold'
-			});
-		});
+		
 		include('/plugin_assets/redmine_statusboard/javascripts/strftime.js', function() {
 			$.getJSON('/statusboard/versions', function(data) {
 				console.debug(data);
@@ -81,17 +88,8 @@ window.HighlightStatus = {
 		colorRows();
 	},
 	colorReleaseSchedule:function() {
-		var mapping = {
-			'a' : '', // anything not matched below will be given the default color
-			'a.status-1': 'New',
-			'a.status-3': 'Resolved',
-			'a.status-4': 'Reopened',
-			'a.status-5': 'In Testing',
-			'a.status-6': 'Closed',
-			'a.status-7': 'Rejected',
-			'a.status-8': 'Deployed'
-		},
-		rows = $('.related-issues li');
+		var mapping = this.getClassMapping();
+		var rows = $('.related-issues li');
 		for(var selector in mapping) {
 			rows.find(selector).parent().css('color', HighlightStatus.getStatusColor(mapping[selector]));
 		}
