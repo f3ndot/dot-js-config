@@ -1,18 +1,21 @@
 window.HighlightStatus = {
 	getStatusColor:function(statusText) {
+		console.log('getting color for', statusText);
 		switch (statusText) {
 		case 'Closed':
 		case 'Deployed':
-			return 'green';
+			return '#008000';
 		case 'Resolved':
 		case 'In Testing':
-			return 'blue';
+		case 'Ready for testing on Trunk':
+		case 'Ready for testing on RC':
+			return '#0000ff';
 		case 'Rejected':
-			return 'black';
+			return '#0000ff';
 		case 'New':
 		case 'Assigned':
 		default:
-			return 'red';
+			return '#ff0000';
 		}
 	},
 	getClassMapping: function() {
@@ -33,7 +36,8 @@ window.HighlightStatus = {
 			var status_field = $('table.list.issues .status').each(function() {
 				$(this).css({
 					'backgroundColor':HighlightStatus.getStatusColor($(this).text()),
-					'color':'white'
+					'color':'white',
+					'white-space': 'normal'
 				});
 			});
 		};
@@ -52,10 +56,16 @@ window.HighlightStatus = {
 		colorRows();
 	},
 	colorSingleIssue:function() {
-		var status = $('.status')[1];
-		$('.status').css({
-			'backgroundColor':HighlightStatus.getStatusColor(status.innerText),
+		$('.attributes .status').css({
+			'backgroundColor':HighlightStatus.getStatusColor($('.attributes .status')[1].innerText),
 			'color':'white'
+		});
+		$('#relations .status').each(function() {
+			var _this = $(this);
+			_this.css({
+				'backgroundColor':HighlightStatus.getStatusColor(this.innerText),
+				'color':'white'
+			});
 		});
 		
 		include('/plugin_assets/redmine_statusboard/javascripts/strftime.js', function() {
