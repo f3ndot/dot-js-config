@@ -4,18 +4,19 @@ window.HighlightStatus = {
 		switch (statusText) {
 		case 'Closed':
 		case 'Deployed':
-			return '#008000';
+			return 'rgba(0, 128, 0, .7)'; // Green
 		case 'Resolved':
 		case 'In Testing':
 		case 'Ready for testing on Trunk':
+			return 'rgba(0, 0, 255, .7)'; // Blue
 		case 'Ready for testing on RC':
-			return '#0000ff';
+			return 'rgba(140, 0, 255, .7)'; // Purple
 		case 'Rejected':
-			return '#0000ff';
+			return 'rgba(0, 0, 0, .7)'; // Black
 		case 'New':
 		case 'Assigned':
 		default:
-			return '#ff0000';
+			return 'rgba(255, 0, 0, .65)'; // Red
 		}
 	},
 	getClassMapping: function() {
@@ -24,21 +25,35 @@ window.HighlightStatus = {
 			'a.status-1': 'New',
 			'a.status-3': 'Resolved',
 			'a.status-4': 'Reopened',
-			'a.status-5': 'In Testing',
-			'a.status-6': 'Closed',
-			'a.status-7': 'Rejected',
-			'a.status-8': 'Deployed'
+			'a.status-5': 'Ready for testing on RC',
+			'a.status-6': 'Ready for testing on Trunk',
+			'a.status-7': 'In Testing',
+			'a.status-8': 'Closed',
+			'a.status-9': 'Rejected',
+			'a.status-10': 'Deployed',
 		};
 	},
+	getBackgroundCSSAttrs: function(text) {
+		return {
+			'backgroundColor':HighlightStatus.getStatusColor(text),
+			'color':'white',
+			'white-space': 'normal',
+			'text-shadow': '0px 0px 1px #000'
+		}
+	},
+	getForegroundCSSAttrs: function(text) {
+		return {
+			'color': HighlightStatus.getStatusColor(text)
+		}
+	},
 	colorIndexRows:function() {
+
 		var colorRows = function() {
 			console.debug('coloring the rows');
 			var status_field = $('table.list.issues .status').each(function() {
-				$(this).css({
-					'backgroundColor':HighlightStatus.getStatusColor($(this).text()),
-					'color':'white',
-					'white-space': 'normal'
-				});
+				$(this).css(HighlightStatus.getBackgroundCSSAttrs(
+					$(this).text()
+				));
 			});
 		};
 		
@@ -56,16 +71,15 @@ window.HighlightStatus = {
 		colorRows();
 	},
 	colorSingleIssue:function() {
-		$('.attributes .status').css({
-			'backgroundColor':HighlightStatus.getStatusColor($('.attributes .status')[1].innerText),
-			'color':'white'
-		});
+		$('.attributes .status').css(HighlightStatus.getBackgroundCSSAttrs(
+			$('.attributes .status')[1].innerText
+		));
 		$('#relations .status').each(function() {
 			var _this = $(this);
-			_this.css({
-				'backgroundColor':HighlightStatus.getStatusColor(this.innerText),
-				'color':'white'
-			});
+			_this.css(HighlightStatus.getBackgroundCSSAttrs(
+				this.innerText
+			));
+
 		});
 		
 		include('/plugin_assets/redmine_statusboard/javascripts/strftime.js', function() {
@@ -85,9 +99,9 @@ window.HighlightStatus = {
 		var colorRows = function() {
 			$('#search-results dt a').each(function() {
 				var status = $(this).text().match(/\w+ #\d+ \((\w+)\)\:/);
-				$(this).css({
-					'color': HighlightStatus.getStatusColor(status[1])
-				});
+				$(this).css(HighlightStatus.getForegroundCSSAttrs(
+					status[1]
+				));
 			});
 		}
 		$('#main').delegate('center a', 'click', function() {
@@ -98,21 +112,32 @@ window.HighlightStatus = {
 		colorRows();
 	},
 	colorReleaseSchedule:function() {
-		var mapping = this.getClassMapping();
-		var rows = $('.related-issues li');
+		var mapping = HighlightStatus.getClassMapping();
+		var rows = $('.related-issues tr');
 		for(var selector in mapping) {
-			rows.find(selector).parent().css('color', HighlightStatus.getStatusColor(mapping[selector]));
+			rows.find(selector).parent().css(HighlightStatus.getForegroundCSSAttrs(
+				mapping[selector]
+			));
 		}
 	}
 };
 
 (function($) {
 	var url_mapping = [ {
-		'regex':/^\/projects\/(\w*)\/issues(.*)/, // example: 'http://redmine.2ndsiteinc.com/projects/freshapp/issues?query_id=281',
+		/* 
+		 * example: 
+		 * 'http://redmine.2ndsiteinc.com/projects/freshapp/issues?query_id=281'
+		 * 'http://redmine.2ndsiteinc.com/issues?query_id=281'
+		 */
+		'regex':/\/issues(.*)/,
 		'msg':'Issue Search Results',
 		'func':HighlightStatus.colorIndexRows
 	}, {
-		'regex':/^\/issues\/(\d*)/, // example: 'http://redmine.2ndsiteinc.com/issues/11831'
+		/*
+		 * example: 
+		 * 'http://redmine.2ndsiteinc.com/issues/11831'
+		 */
+		'regex':/^\/issues\/(\d*)/,
 		'msg':'Single Issue',
 		'func':HighlightStatus.colorSingleIssue
 	}, {
@@ -120,11 +145,10 @@ window.HighlightStatus = {
 		'msg':'Project Search Results',
 		'func':HighlightStatus.colorProjectSearch
 	}, {
-		'regex':/^\/versions\/show\/(.*)|\/projects\/(.+)\/roadmap/,
+		'regex':/^\/versions\/(.*)|^\/versions\/show\/(.*)|\/projects\/(.+)\/roadmap/,
 		'msg':'Release Schedule',
 		'func':HighlightStatus.colorReleaseSchedule
-	}
-	];
+	} ];
 	
 	$(document).ready(function() {
 		for(var i in url_mapping) {
@@ -137,7 +161,6 @@ window.HighlightStatus = {
 		}
 	});
 })(jQuery);
-
 
 
 function formatPastReleaseDate(date) {
