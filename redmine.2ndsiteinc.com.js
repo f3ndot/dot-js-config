@@ -1,4 +1,7 @@
-window.HighlightStatus = {
+/*jslint smarttabs:true */
+/*global include */
+
+var HighlightStatus = {
 	getStatusColor:function(statusText) {
 		console.log('getting color for', statusText);
 		switch (statusText) {
@@ -39,12 +42,12 @@ window.HighlightStatus = {
 			'color':'white',
 			'white-space': 'normal',
 			'text-shadow': '0px 0px 1px #000'
-		}
+		};
 	},
 	getForegroundCSSAttrs: function(text) {
 		return {
 			'color': HighlightStatus.getStatusColor(text)
-		}
+		};
 	},
 	colorIndexRows:function() {
 
@@ -56,7 +59,7 @@ window.HighlightStatus = {
 				));
 			});
 		};
-		
+
 		$('#content').delegate('.pagination a', 'click', function() {
 			setTimeout(colorRows,  500);
 			setTimeout(colorRows, 1000);
@@ -67,7 +70,7 @@ window.HighlightStatus = {
 			setTimeout(colorRows, 1000);
 			setTimeout(colorRows, 2000);
 		});
-		
+
 		colorRows();
 	},
 	colorSingleIssue:function() {
@@ -81,7 +84,7 @@ window.HighlightStatus = {
 			));
 
 		});
-		
+
 		include('/plugin_assets/redmine_statusboard/javascripts/strftime.js', function() {
 			$.getJSON('/statusboard/versions', function(data) {
 				console.debug(data);
@@ -103,7 +106,7 @@ window.HighlightStatus = {
 					status[1]
 				));
 			});
-		}
+		};
 		$('#main').delegate('center a', 'click', function() {
 			setTimeout(colorRows,  500);
 			setTimeout(colorRows, 1000);
@@ -124,8 +127,8 @@ window.HighlightStatus = {
 
 (function($) {
 	var url_mapping = [ {
-		/* 
-		 * example: 
+		/*
+		 * example:
 		 * 'http://redmine.2ndsiteinc.com/projects/freshapp/issues?query_id=281'
 		 * 'http://redmine.2ndsiteinc.com/issues?query_id=281'
 		 */
@@ -134,7 +137,7 @@ window.HighlightStatus = {
 		'func':HighlightStatus.colorIndexRows
 	}, {
 		/*
-		 * example: 
+		 * example:
 		 * 'http://redmine.2ndsiteinc.com/issues/11831'
 		 */
 		'regex':/^\/issues\/(\d*)/,
@@ -149,10 +152,10 @@ window.HighlightStatus = {
 		'msg':'Release Schedule',
 		'func':HighlightStatus.colorReleaseSchedule
 	} ];
-	
+
 	$(document).ready(function() {
 		for(var i in url_mapping) {
-			mapping = url_mapping[i];
+			var mapping = url_mapping[i];
 			if (window.location.pathname.search(new RegExp(mapping.regex)) >= 0) {
 				console.debug(window.location.pathname, 'matches', mapping.regex);
 				console.debug(mapping.msg);
@@ -169,9 +172,9 @@ function formatPastReleaseDate(date) {
 
 function formatFutureReleaseDate(now, date) {
 	 var baseDate = formatPastReleaseDate(date);
-	 
+
 	 var millis = date - now;
-	 
+
 	 var seconds = millis / 1000;
 	 var minutes = seconds / 60;
 	 var hours = minutes / 60;
@@ -179,9 +182,9 @@ function formatFutureReleaseDate(now, date) {
 
 	 if (days > 1) {
 		  return baseDate + " (" + days + " days)";
-	 } else if (days == 1) {
+	 } else if (days === 1) {
 		  return baseDate + " (Tomorrow)";
-	 } else if (days == 0) {
+	 } else if (days === 0) {
 		  return baseDate + " (Today)";
 	 } else {
 		  return baseDate + " (" + Math.abs(days) + " days ago)";
@@ -201,7 +204,7 @@ function formatReleaseDate(date) {
 	 var now = today();
 	 var then = new Date();
 	 then.setISO8601Date(date);
-	 
+
 	 if (then < now) {
 		  return formatPastReleaseDate(then);
 	 }
