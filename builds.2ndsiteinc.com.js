@@ -16,7 +16,7 @@ var GIT_BASE = matches(/GIT_BASE_REPO=&#039;(.*?)&#039;<br>/),
 	waiting_time = matches(/Waiting for (.*)/);
 
 var link = function(url, text) {
-	return ['<a href="', url, '">', text, '</a>'].join('');
+	return ['<a href="', url, '" target="_parent">', text, '</a>'].join('');
 };
 var right = function(text) {
 	return ['<div style="float:right;">', text, '</div>'].join('');
