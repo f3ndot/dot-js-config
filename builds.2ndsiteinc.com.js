@@ -1,4 +1,6 @@
 (function() {
+"use strict";
+
 var matches = function(regex) {
 	return function(text) {
 		var match = text.match(regex);
@@ -13,7 +15,9 @@ var GIT_BASE = matches(/GIT_BASE_REPO=&#039;(.*?)&#039;<br>/),
 	GIT_SHA_short = function(text) {
 		return matches(/GIT_SHA1=&#039;(.*)&#039;<br>/)(text).slice(0, 10);
 	},
-	waiting_time = matches(/Waiting for (.*)/);
+	waiting_time = matches(/Waiting for (.*)/),
+	started = matches(/Started (.*?) ago/),
+	estimated = matches(/Estimated remaining time: (.*)/);
 
 var link = function(url, text) {
 	return ['<a href="', url, '" target="_parent">', text, '</a>'].join('');
@@ -22,7 +26,7 @@ var right = function(text) {
 	return ['<div style="float:right;">', text, '</div>'].join('');
 };
 
-var printAllHashes = function(table) {
+var rewriteBuildQueue = function(table) {
 	if (table.attr('id') != 'buildQueue') {
 		return;
 	}
@@ -55,6 +59,23 @@ var printAllHashes = function(table) {
 	});
 };
 
+var rewriteExeutorsList = function(table) {
+	if (table.attr('id') != 'executors') {
+		return;
+	}
+
+	table.find('.pane:nth-child(2) div').each(function() {
+		var elem = $(this);
+
+		var tooltip = elem.find('.progress-bar').attr('tooltip');
+		if (!tooltip) {
+			return;
+		}
+
+		elem.append(['+', started(tooltip), right('-' + estimated(tooltip))].join(''));
+	});
+};
+
 $(document).ready(function() {
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
@@ -62,7 +83,9 @@ $(document).ready(function() {
 		// fired when a mutation occurs
 		$.each(mutations, function(i, mutation) {
 			if (mutation.addedNodes.length) {
-				printAllHashes($(mutation.addedNodes[0]));
+				var node = $(mutation.addedNodes[0]);
+				rewriteBuildQueue(node);
+				rewriteExeutorsList(node);
 			}
 		});
 	});
@@ -75,6 +98,7 @@ $(document).ready(function() {
 		attributes: false
 	});
 
-	printAllHashes($('#buildQueue'));
+	rewriteBuildQueue($('#buildQueue'));
+	rewriteExeutorsList($('#executors'));
 });
 })();
