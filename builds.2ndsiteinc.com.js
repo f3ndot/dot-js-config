@@ -8,11 +8,11 @@ var matches = function(regex) {
 	};
 };
 
-var GIT_BASE = matches(/GIT_BASE_REPO=&#039;(.*?)&#039;<br>/),
-	GIT_HEAD = matches(/GIT_HEAD_REPO=&#039;(.*?)&#039;<br>/),
-	GITHUB_URL_toUrl = matches(/GITHUB_URL=&#039;(.*)&#039;<br>/),
-	GITHUB_URL_toPR = matches(/\/pull\/([0-9]+)&#039;<br>/),
-	GIT_SHA_short = function(text) {
+var git_base = matches(/GIT_BASE_REPO=&#039;(.*?)&#039;<br>/),
+	git_head = matches(/GIT_HEAD_REPO=&#039;(.*?)&#039;<br>/),
+	github_url_toUrl = matches(/GITHUB_URL=&#039;(.*)&#039;<br>/),
+	github_url_toPR = matches(/\/pull\/([0-9]+)&#039;<br>/),
+	git_sha_short = function(text) {
 		return matches(/GIT_SHA1=&#039;(.*)&#039;<br>/)(text).slice(0, 10);
 	},
 	waiting_time = matches(/Waiting for (.*)/),
@@ -32,11 +32,11 @@ var rewriteBuildQueue = function(table) {
 
 		var text = elem.attr('tooltip').replace(/\(StringParameterValue\) /g, '');
 
-		var to = GIT_BASE(text), // this is the destination repo ('dev')
-			from = GIT_HEAD(text), // this could be a fork
-			url = GITHUB_URL_toUrl(text),
-			pr = GITHUB_URL_toPR(text),
-			sha = GIT_SHA_short(text),
+		var to = git_base(text), // this is the destination repo ('dev')
+			from = git_head(text), // this could be a fork
+			url = github_url_toUrl(text),
+			pr = github_url_toPR(text),
+			sha = git_sha_short(text),
 			wait = waiting_time(text),
 			repo = (to != from ? '<b>' + from + '</b>' : ''),
 			output = elem.text();
@@ -72,7 +72,7 @@ var rewriteExeutorsList = function(table) {
 $(document).ready(function() {
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
-	var observer = new MutationObserver(function(mutations, observer) {
+	var observer = new MutationObserver(function(mutations) {
 		// fired when a mutation occurs
 		$.each(mutations, function(i, mutation) {
 			if (mutation.addedNodes.length) {
