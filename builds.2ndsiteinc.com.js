@@ -1,31 +1,31 @@
 (function() {
 var GIT_BASE = function(text) {
 	var matches = text.match(/GIT_BASE_REPO=&#039;(.*?)&#039;<br>/);
-	return matches[1];
+	return matches ? matches[1] : '';
 };
 var GIT_HEAD = function(text) {
 	var matches = text.match(/GIT_HEAD_REPO=&#039;(.*?)&#039;<br>/);
-	return matches[1];
+	return matches ? matches[1] : '';
 };
 
 var GITHUB_URL_toUrl = function(text) {
 	var matches = text.match(/GITHUB_URL=&#039;(.*)&#039;<br>/);
-	return matches[1];
+	return matches ? matches[1] : '';
 };
 
 var GITHUB_URL_toPR = function(text) {
 	var matches = text.match(/\/pull\/([0-9]+)&#039;<br>/);
-	return matches[1];
+	return matches ? matches[1] : '';
 };
 
 var GIT_SHA_short = function(text) {
 	var matches = text.match(/GIT_SHA1=&#039;(.*)&#039;<br>/);
-	return matches[1].slice(0, 10);
+	return matches ? matches[1].slice(0, 10) : '';
 };
 
 var waiting_time = function(text) { // Waiting for 35 min
 	var matches = text.match(/Waiting for (.*)/);
-	return matches[1];
+	return matches ? matches[1] : '';
 };
 
 
@@ -43,10 +43,6 @@ var printAllHashes = function(table) {
 	table.find('.pane:first-child').each(function() {
 		var elem = $(this);
 
-		if (elem.text() != 'FreshAppPullRequest') {
-			return;
-		}
-
 		var text = elem.attr('tooltip').replace(/\(StringParameterValue\) /g, '');
 
 		var to = GIT_BASE(text), // this is the destination repo ('dev')
@@ -54,13 +50,20 @@ var printAllHashes = function(table) {
 			url = GITHUB_URL_toUrl(text),
 			pr = GITHUB_URL_toPR(text),
 			sha = GIT_SHA_short(text),
-			wait = waiting_time(text);
+			wait = waiting_time(text),
+			repo = (to != from ? '<b>' + from + '</b>' : ''),
+			output = elem.text();
 
-		var repo = (to != from ? '<b>' + from + '</b>' : '');
-		var output = [
-			[link(url, '# ' + pr), right(wait)].join(' '),
-			[sha, right(repo)].join(' ')
-		].join('<br>');
+		if (wait) {
+			output += right(wait);
+		}
+
+		if (pr) {
+			output = [
+				[link(url, '# ' + pr), right(wait)].join(' '),
+				[sha, right(repo)].join(' ')
+			].join('<br>');
+		}
 
 		elem.html(output);
 	});
