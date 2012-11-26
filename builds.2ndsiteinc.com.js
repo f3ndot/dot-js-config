@@ -27,9 +27,6 @@ var right = function(text) {
 };
 
 var rewriteBuildQueue = function(table) {
-	if (table.attr('id') != 'buildQueue') {
-		return;
-	}
 	table.find('.pane:first-child').each(function() {
 		var elem = $(this);
 
@@ -60,10 +57,6 @@ var rewriteBuildQueue = function(table) {
 };
 
 var rewriteExeutorsList = function(table) {
-	if (table.attr('id') != 'executors') {
-		return;
-	}
-
 	table.find('.pane:nth-child(2) div').each(function() {
 		var elem = $(this);
 
@@ -84,8 +77,11 @@ $(document).ready(function() {
 		$.each(mutations, function(i, mutation) {
 			if (mutation.addedNodes.length) {
 				var node = $(mutation.addedNodes[0]);
-				rewriteBuildQueue(node);
-				rewriteExeutorsList(node);
+				if (node.attr('id') == 'buildQueue') {
+					rewriteBuildQueue(node);
+				} else if (node.attr('id') == 'executors') {
+					rewriteExeutorsList(node);
+				}
 			}
 		});
 	});
