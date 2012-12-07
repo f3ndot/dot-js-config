@@ -47,8 +47,8 @@ var rewriteBuildQueue = function(table) {
 
 		if (pr) {
 			output = [
-				[link(url, '# ' + pr), right(wait)].join(' '),
-				[sha, right(repo)].join(' ')
+				[link(url, '# ' + pr), right(sha)].join(' '),
+				['+' + wait, right(repo)].join(' ')
 			].join('<br>');
 		}
 
