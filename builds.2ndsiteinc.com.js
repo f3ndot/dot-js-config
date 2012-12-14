@@ -38,7 +38,7 @@ var rewriteBuildQueue = function(table) {
 			pr = github_url_toPR(text),
 			sha = git_sha_short(text),
 			wait = waiting_time(text),
-			repo = (to != from ? '<b>' + from + '</b>' : ''),
+			repo = (to != from ? from : ''),
 			output = elem.text();
 
 		if (wait) {
