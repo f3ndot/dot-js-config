@@ -46,6 +46,12 @@ var rewriteBuildQueue = function(table) {
 		}
 
 		if (pr) {
+			var parent = elem.parent().attr('data-pr', pr);
+			var siblings = parent.siblings('[data-pr=' + pr + ']')
+				.css({backgroundColor: 'rgba(255, 0, 0, .1)'});
+			if (siblings.length) {
+				elem.css({backgroundColor: 'rgba(0, 0, 255, .05)'});
+			}
 			output = [
 				[link(url, '# ' + pr), right(sha)].join(' '),
 				['+' + wait, right(repo)].join(' ')
