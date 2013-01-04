@@ -27,7 +27,7 @@ var right = function(text) {
 };
 
 var rewriteBuildQueue = function(table) {
-	table.find('.pane:first-child').each(function() {
+	table.find('.pane:first-child a').each(function() {
 		var elem = $(this);
 
 		var text = elem.attr('tooltip').replace(/\(StringParameterValue\) /g, '');
