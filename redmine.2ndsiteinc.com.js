@@ -1,7 +1,10 @@
 /*jslint smarttabs:true */
 /*global include */
+(function() {
+	"use strict";
 
 var HighlightStatus = {
+
 	getStatusColor:function(statusText) {
 		console.log('getting color for', statusText);
 		switch (statusText) {
@@ -16,6 +19,8 @@ var HighlightStatus = {
 			return 'rgba(140, 0, 255, .7)'; // Purple
 		case 'Rejected':
 			return 'rgba(0, 0, 0, .7)'; // Black
+		case 'Triaged':
+			return 'rgba(255, 155, 5, 1)'; // Orange
 		case 'New':
 		case 'Assigned':
 		default:
@@ -41,7 +46,7 @@ var HighlightStatus = {
 			'backgroundColor':HighlightStatus.getStatusColor(text),
 			'color':'white',
 			'white-space': 'normal',
-			'text-shadow': '0px 0px 1px #000'
+			'text-shadow': '#000 0px 0px 3px'
 		};
 	},
 	getForegroundCSSAttrs: function(text) {
@@ -211,5 +216,4 @@ function formatReleaseDate(date) {
 	 return formatFutureReleaseDate(now, then);
 }
 
-
-
+})();
