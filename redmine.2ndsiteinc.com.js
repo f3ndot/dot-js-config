@@ -82,7 +82,7 @@ var HighlightStatus = {
 		$('.attributes .status').css(HighlightStatus.getBackgroundCSSAttrs(
 			$('.attributes .status')[1].innerText
 		));
-		$('#relations .status').each(function() {
+		$('#relations .status, #issue_tree td:nth-child(3)').each(function() {
 			var _this = $(this);
 			_this.css(HighlightStatus.getBackgroundCSSAttrs(
 				this.innerText
