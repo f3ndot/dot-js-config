@@ -8,12 +8,12 @@ var matches = function(regex) {
 	};
 };
 
-var git_base = matches(/GIT_BASE_REPO=&#039;(.*?)&#039;<br>/),
-	git_head = matches(/GIT_HEAD_REPO=&#039;(.*?)&#039;<br>/),
-	github_url_toUrl = matches(/GITHUB_URL=&#039;(.*)&#039;<br>/),
-	github_url_toPR = matches(/\/pull\/([0-9]+)&#039;<br>/),
+var git_base = matches(/GIT_BASE_REPO=(.*?)<br>/),
+	git_head = matches(/GIT_HEAD_REPO=(.*?)<br>/),
+	github_url_toUrl = matches(/GITHUB_URL=(.*)<br>/),
+	github_url_toPR = matches(/\/pull\/([0-9]+)<br>/),
 	git_sha_short = function(text) {
-		return matches(/GIT_SHA1=&#039;(.*)&#039;<br>/)(text).slice(0, 10);
+		return matches(/GIT_SHA1=(.*)<br>/)(text).slice(0, 10);
 	},
 	waiting_time = matches(/Waiting for (.*)/),
 	started = matches(/Started (.*?) ago/),
