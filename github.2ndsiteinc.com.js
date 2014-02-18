@@ -1,4 +1,20 @@
-$('.commit-ref').each(function() {
+$('head').append(
+	$('<style>', {
+		html: '\
+			.link-to-redmine {\
+				margin-left: 10px;\
+				padding: 5px;\
+				border-radius: 3px;\
+			}\
+			.link-to-redmine:hover {\
+				background: #628DB6;\
+				color: white;\
+			}\
+		'
+	})
+);
+
+$('.commit-ref, .branch-name').each(function() {
 	"use strict";
 
 	var redmineRegex = "(issue|issues|feature|refactor|bug|hotfix|task)[-/]([0-9]\{5\})";
@@ -12,7 +28,7 @@ $('.commit-ref').each(function() {
 
 		$el.after(
 			$('<a>', {
-				style: 'margin-left: 10px;',
+				'class': 'link-to-redmine',
 				target: '_blank',
 				text: 'See in Redmine',
 				href: 'http://redmine/issues/' + redmineid
