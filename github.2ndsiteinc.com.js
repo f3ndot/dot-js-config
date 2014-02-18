@@ -2,7 +2,8 @@ $('head').append(
 	$('<style>', {
 		html: '\
 			.link-to-redmine {\
-				margin-left: 10px;\
+				margin-left: 5px;\
+				margin-right: 5px;\
 				padding: 5px;\
 				border-radius: 3px;\
 			}\
