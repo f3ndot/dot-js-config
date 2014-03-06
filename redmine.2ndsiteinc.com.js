@@ -131,8 +131,17 @@ var HighlightStatus = {
 };
 
 var InsertLinks = {
+	_mapProjectsToRepo: function(project) {
+		return {
+			'Release Schedule » FreshApp': 'dev/freshapp',
+			'Release Schedule » Evolve': 'dev/evolve'
+		}[project];
+	},
+
 	linkGHMergeCommits: function() {
-		var re = /Merge pull request #(\d+) from/;
+		var re = /Merge pull request #(\d+) from/,
+			project = $('#header h1').text(),
+			repo = this._mapProjectsToRepo(project);
 		$('#issue-changesets .changeset').each(function() {
 			var commitMessage = $('.wiki', this).text().trim(),
 				matches = commitMessage.match(re);
@@ -140,7 +149,7 @@ var InsertLinks = {
 				var pr = matches[1],
 					link = $('<a>', {
 						text: 'View PR in Github',
-						href: 'https://github.2ndsiteinc.com/dev/freshapp/pull/' + pr,
+						href: 'https://github.2ndsiteinc.com/' + repo + '/pull/' + pr,
 						target: '_blank',
 						style: 'float: right; cursor: pointer;'
 					});
