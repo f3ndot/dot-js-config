@@ -1,5 +1,5 @@
 /*jslint smarttabs:true */
-/*global include */
+/*global include, $, window */
 (function() {
 	"use strict";
 
@@ -130,6 +130,26 @@ var HighlightStatus = {
 	}
 };
 
+var InsertLinks = {
+	linkGHMergeCommits: function() {
+		var re = /Merge pull request #(\d+) from/;
+		$('#issue-changesets .changeset').each(function() {
+			var commitMessage = $('.wiki', this).text().trim();
+			var matches = commitMessage.match(re);
+			if (matches && matches[1]) {
+				var pr = matches[1];
+				var link = $('<a>', {
+					text: 'View PR in Github',
+					href: 'https://github.2ndsiteinc.com/dev/freshapp/pull/' + pr,
+					target: '_blank',
+					style: 'float: right; cursor: pointer;'
+				});
+				$(this).prepend(link);
+			}
+		});
+	}
+};
+
 (function($) {
 	var url_mapping = [ {
 		/*
@@ -147,7 +167,10 @@ var HighlightStatus = {
 		 */
 		'regex':/^\/issues\/(\d*)/,
 		'msg':'Single Issue',
-		'func':HighlightStatus.colorSingleIssue
+		'func': function() {
+			HighlightStatus.colorSingleIssue();
+			InsertLinks.linkGHMergeCommits();
+		}
 	}, {
 		'regex':/^\/search\/index\/(.*)/,
 		'msg':'Project Search Results',
