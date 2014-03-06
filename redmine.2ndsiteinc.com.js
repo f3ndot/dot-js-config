@@ -153,7 +153,9 @@ var InsertLinks = {
 						target: '_blank',
 						style: 'float: right; cursor: pointer;'
 					});
-				$(this).prepend(link);
+				$(this)
+					.css({backgroundColor: '#fcf8e9'})
+					.prepend(link);
 			}
 		});
 	}
