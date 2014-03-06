@@ -134,16 +134,16 @@ var InsertLinks = {
 	linkGHMergeCommits: function() {
 		var re = /Merge pull request #(\d+) from/;
 		$('#issue-changesets .changeset').each(function() {
-			var commitMessage = $('.wiki', this).text().trim();
-			var matches = commitMessage.match(re);
+			var commitMessage = $('.wiki', this).text().trim(),
+				matches = commitMessage.match(re);
 			if (matches && matches[1]) {
-				var pr = matches[1];
-				var link = $('<a>', {
-					text: 'View PR in Github',
-					href: 'https://github.2ndsiteinc.com/dev/freshapp/pull/' + pr,
-					target: '_blank',
-					style: 'float: right; cursor: pointer;'
-				});
+				var pr = matches[1],
+					link = $('<a>', {
+						text: 'View PR in Github',
+						href: 'https://github.2ndsiteinc.com/dev/freshapp/pull/' + pr,
+						target: '_blank',
+						style: 'float: right; cursor: pointer;'
+					});
 				$(this).prepend(link);
 			}
 		});
@@ -157,28 +157,28 @@ var InsertLinks = {
 		 * 'http://redmine.2ndsiteinc.com/projects/freshapp/issues?query_id=281'
 		 * 'http://redmine.2ndsiteinc.com/issues?query_id=281'
 		 */
-		'regex':/\/issues(.*)/,
-		'msg':'Issue Search Results',
-		'func':HighlightStatus.colorIndexRows
+		'regex': /\/issues(.*)/,
+		'msg': 'Issue Search Results',
+		'func': HighlightStatus.colorIndexRows
 	}, {
 		/*
 		 * example:
 		 * 'http://redmine.2ndsiteinc.com/issues/11831'
 		 */
-		'regex':/^\/issues\/(\d*)/,
-		'msg':'Single Issue',
+		'regex': /^\/issues\/(\d*)/,
+		'msg': 'Single Issue',
 		'func': function() {
 			HighlightStatus.colorSingleIssue();
 			InsertLinks.linkGHMergeCommits();
 		}
 	}, {
-		'regex':/^\/search\/index\/(.*)/,
-		'msg':'Project Search Results',
-		'func':HighlightStatus.colorProjectSearch
+		'regex': /^\/search\/index\/(.*)/,
+		'msg': 'Project Search Results',
+		'func': HighlightStatus.colorProjectSearch
 	}, {
-		'regex':/^\/versions\/(.*)|^\/versions\/show\/(.*)|\/projects\/(.+)\/roadmap/,
-		'msg':'Release Schedule',
-		'func':HighlightStatus.colorReleaseSchedule
+		'regex': /^\/versions\/(.*)|^\/versions\/show\/(.*)|\/projects\/(.+)\/roadmap/,
+		'msg': 'Release Schedule',
+		'func': HighlightStatus.colorReleaseSchedule
 	} ];
 
 	$(document).ready(function() {
