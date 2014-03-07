@@ -1,5 +1,10 @@
+/*global window, document, console, $ */
+
 (function() {
 	"use strict";
+
+	var redmineBranchNameRegex = "(issue|issues|feature|refactor|bug|hotfix|task)[-/]([0-9]{5})";
+	var redmineTicketInCommitRegex = new RegExp("(refs|references|IssueID|see|fixes|closes|fix) #([0-9]{5})", "i");
 
 	var includeSexyStyles = function() {
 		$('head').append(
@@ -12,33 +17,66 @@
 					"}",
 					".link-to-redmine:hover {",
 						"background: #628DB6;",
-						"color: white;",
+						"color: white !important;",
 					"}"].join("\n")
 			})
 		);
 	};
 
-	var linkUpTheBranchNames = function(root) {
-		$('.commit-ref, .branch-name', root).each(function() {
-			var redmineRegex = "(issue|issues|feature|refactor|bug|hotfix|task)[-/]([0-9]\{5\})";
-
-			var $el = $(this),
-				text = $el.text().trim(),
-				matches = text.match(redmineRegex);
+	var extractTicketBuilder = function(regex) {
+		return function($el) {
+			var text = (typeof($el) == 'string' ? $el : $el.text().trim()),
+				matches = text.match(regex);
 
 			if (matches && matches.length == 3 && matches[2]) {
-				var redmineid = matches[2];
+				return matches[2];
+			}
+		};
+	};
 
-				$el.after(
-					$('<a>', {
-						'class': 'link-to-redmine',
-						target: '_blank',
-						text: 'See in Redmine',
-						href: 'http://redmine/issues/' + redmineid
-					})
-				);
+	var extractTicketFromBranchName = extractTicketBuilder(redmineBranchNameRegex);
+	var extractTicketFromCommit = extractTicketBuilder(redmineTicketInCommitRegex);
+
+	var makeLinkToRedmine = function(redmineid) {
+		return $('<a>', {
+			'class': 'link-to-redmine',
+			target: '_blank',
+			text: 'See in Redmine',
+			href: 'http://redmine/issues/' + redmineid
+		});
+	};
+
+	var linkUpTheBranchNames = function(root) {
+		$('.commit-ref, .branch-name', root).each(function() {
+			var $el = $(this),
+				redmineid = extractTicketFromBranchName($el);
+
+			if (redmineid) {
+				$el.after(makeLinkToRedmine(redmineid));
 			}
 		});
+	};
+
+	var appendLinkToCommitMessage = function($el, link) {
+		if ($el.find('.commit-desc').length) {
+			$el.find('.commit-desc')
+				.css({'position': 'relative'})
+				.append(
+					link.css({
+						'position': 'absolute',
+						'right': 0,
+						'bottom': 0
+					})
+				);
+		} else {
+			$el.find('td.message')
+				.append(
+					link.css({
+						'float': 'right',
+						'marginLeft': '-5px'
+					})
+				);
+		}
 	};
 
 	var listenToChanges = function(whatsChanging, whatHappens) {
@@ -67,16 +105,65 @@
 	};
 
 	$(document).ready(function() {
-		includeSexyStyles();
-		linkUpTheBranchNames();
+		var urlMapping = [{
+			'regex': '.*',
+			'msg': 'Any Page',
+			'func': function() {
+				includeSexyStyles();
+				linkUpTheBranchNames();
 
-		listenToChanges(document.getElementById('pull-head'), function(node) {
-			linkUpTheBranchNames(node);
-		});
+				// this is the main body that contains the PR 'tab' (list and item views)
+				listenToChanges(document.getElementById('js-repo-pjax-container'), function(node) {
+					linkUpTheBranchNames(node);
+				});
+			}
+		}, {
+			'regex': /^\/dev\/freshapp\/pull\/(\d+)/,
+			'msg': 'View Pull Request',
+			'func': function() {
+				// get the pr source branch from the top of the page
+				var needsWarning = false;
+				var sourceTicket = extractTicketFromBranchName($('#pull-head .commit-ref').last());
 
-		listenToChanges(document.getElementById('js-repo-pjax-container'), function(node) {
-			linkUpTheBranchNames(node);
-		});
+				$('.commit').each(function() {
+					var $el = $(this),
+						message = $el.find('.message .message'),
+						ticket = extractTicketFromCommit(message.attr('title'));
+
+					if (ticket) {
+						appendLinkToCommitMessage($el, makeLinkToRedmine(ticket));
+
+						if (ticket != sourceTicket) {
+							needsWarning = true; // add an error message to the top of the page!
+							$el.find('.message *').css({
+								color: 'rgb(193, 143, 68)' // Orange @ 50% saturation
+							});
+						}
+					} else {
+						needsWarning = true; // add an error message to the top of the page!
+						$el.find('.message *').css({
+							color: 'rgb(191, 64, 64)' // Red @ 50% saturation
+						});
+					}
+				});
+
+				if (needsWarning) {
+					var commitTab = $('.tabnav-tabs.js-hard-tabs [data-container-id=commits_bucket]');
+					commitTab.add(commitTab.children()).css({
+						color: 'rgb(191, 64, 64)' // Red @ 50% saturation
+					});
+				}
+			}
+		}];
+
+		for (var i in urlMapping) {
+			var mapping = urlMapping[i];
+			if (window.location.pathname.search(new RegExp(mapping.regex)) >= 0) {
+				console.debug(window.location.pathname, 'matches', mapping.regex);
+				console.debug(mapping.msg);
+				mapping.func();
+			}
+		}
 	});
 
 })();
