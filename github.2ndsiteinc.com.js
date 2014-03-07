@@ -79,6 +79,41 @@
 		}
 	};
 
+	var linkPRViewWithRedmine = function(root) {
+		// get the pr source branch from the top of the page
+		var needsWarning = false;
+		var sourceTicket = extractTicketFromBranchName($('#pull-head .commit-ref').last());
+
+		$('.commit', root).each(function() {
+			var $el = $(this),
+				message = $el.find('.message .message'),
+				ticket = extractTicketFromCommit(message.attr('title'));
+
+			if (ticket) {
+				appendLinkToCommitMessage($el, makeLinkToRedmine(ticket));
+
+				if (ticket != sourceTicket) {
+					needsWarning = true; // add an error message to the top of the page!
+					$el.find('.message *').css({
+						color: 'rgb(193, 143, 68)' // Orange @ 50% saturation
+					});
+				}
+			} else {
+				needsWarning = true; // add an error message to the top of the page!
+				$el.find('.message *').css({
+					color: 'rgb(191, 64, 64)' // Red @ 50% saturation
+				});
+			}
+		});
+
+		if (needsWarning) {
+			var commitTab = $('.tabnav-tabs.js-hard-tabs [data-container-id=commits_bucket]');
+			commitTab.add(commitTab.children()).css({
+				color: 'rgb(191, 64, 64)' // Red @ 50% saturation
+			});
+		}
+	};
+
 	var listenToChanges = function(whatsChanging, whatHappens) {
 		if (!whatsChanging) {
 			return;
@@ -113,46 +148,15 @@
 				linkUpTheBranchNames();
 
 				// this is the main body that contains the PR 'tab' (list and item views)
-				listenToChanges(document.getElementById('js-repo-pjax-container'), function(node) {
-					linkUpTheBranchNames(node);
-				});
+				listenToChanges(document.getElementById('js-repo-pjax-container'), linkUpTheBranchNames);
 			}
 		}, {
 			'regex': /^\/dev\/freshapp\/pull\/(\d+)/,
 			'msg': 'View Pull Request',
 			'func': function() {
-				// get the pr source branch from the top of the page
-				var needsWarning = false;
-				var sourceTicket = extractTicketFromBranchName($('#pull-head .commit-ref').last());
+				linkPRViewWithRedmine();
 
-				$('.commit').each(function() {
-					var $el = $(this),
-						message = $el.find('.message .message'),
-						ticket = extractTicketFromCommit(message.attr('title'));
-
-					if (ticket) {
-						appendLinkToCommitMessage($el, makeLinkToRedmine(ticket));
-
-						if (ticket != sourceTicket) {
-							needsWarning = true; // add an error message to the top of the page!
-							$el.find('.message *').css({
-								color: 'rgb(193, 143, 68)' // Orange @ 50% saturation
-							});
-						}
-					} else {
-						needsWarning = true; // add an error message to the top of the page!
-						$el.find('.message *').css({
-							color: 'rgb(191, 64, 64)' // Red @ 50% saturation
-						});
-					}
-				});
-
-				if (needsWarning) {
-					var commitTab = $('.tabnav-tabs.js-hard-tabs [data-container-id=commits_bucket]');
-					commitTab.add(commitTab.children()).css({
-						color: 'rgb(191, 64, 64)' // Red @ 50% saturation
-					});
-				}
+				listenToChanges(document.getElementById('js-repo-pjax-container'), linkPRViewWithRedmine);
 			}
 		}];
 
