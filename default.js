@@ -1,5 +1,5 @@
 function require(file, callback) {
-	return include('http://localhost:3131/'+file+'.js', callback);
+	return include('//localhost:3131/'+file+'.js', callback);
 }
 
 function include(url, callback) {
