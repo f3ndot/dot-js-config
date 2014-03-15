@@ -4,7 +4,7 @@
 	"use strict";
 
 	var redmineBranchNameRegex = "(issue|issues|feature|refactor|bug|hotfix|task)[-/]([0-9]{5})";
-	var redmineTicketInCommitRegex = new RegExp("(refs|references|IssueID|see|fixes|closes|fix) #([0-9]{5})", "i");
+	var redmineTicketInCommitRegex = new RegExp("(refs|references|IssueID|see|fixes|closes|fix):? #([0-9]{5})", "i");
 
 	var includeSexyStyles = function() {
 		$('head').append(
