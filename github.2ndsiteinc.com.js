@@ -1,4 +1,4 @@
-/*global window, document, console, $ */
+/*global window, document, console, $, _ */
 
 (function() {
 	"use strict";
@@ -79,38 +79,63 @@
 		}
 	};
 
-	var linkPRViewWithRedmine = function(root) {
-		// get the pr source branch from the top of the page
-		var needsWarning = false;
-		var sourceTicket = extractTicketFromBranchName($('#pull-head .commit-ref').last());
+	var commitMessageHasError = function($el, sourceTicket) {
+		var message = $el.find('.message .message'),
+			ticket = extractTicketFromCommit(message.attr('title'));
 
-		$('.commit', root).each(function() {
-			var $el = $(this),
-				message = $el.find('.message .message'),
-				ticket = extractTicketFromCommit(message.attr('title'));
+		if (ticket) {
+			appendLinkToCommitMessage($el, makeLinkToRedmine(ticket));
 
-			if (ticket) {
-				appendLinkToCommitMessage($el, makeLinkToRedmine(ticket));
-
-				if (ticket != sourceTicket) {
-					needsWarning = true; // add an error message to the top of the page!
-					$el.find('.message *').css({
-						color: 'rgb(193, 143, 68)' // Orange @ 50% saturation
-					});
-				}
-			} else {
-				needsWarning = true; // add an error message to the top of the page!
+			if (ticket != sourceTicket) {
 				$el.find('.message *').css({
-					color: 'rgb(191, 64, 64)' // Red @ 50% saturation
+					color: 'rgb(193, 143, 68)' // Orange @ 50% saturation
 				});
+				return true;
 			}
-		});
-
-		if (needsWarning) {
-			var commitTab = $('.tabnav-tabs.js-hard-tabs [data-container-id=commits_bucket]');
-			commitTab.add(commitTab.children()).css({
+		} else {
+			$el.find('.message *').css({
 				color: 'rgb(191, 64, 64)' // Red @ 50% saturation
 			});
+			return true;
+		}
+		return false;
+	};
+
+	var highlightCommitsInError = function(root, sourceTicket) {
+		return $('.commit', root).map(function() {
+			return commitMessageHasError($(this), sourceTicket);
+		});
+	};
+
+	var doesNeedGlobalWarning = function(commitsWithErrors) {
+		return commitsWithErrors.toArray().reduce(function(hasError, memo) {
+			return hasError || memo;
+		}, false);
+	};
+
+	var addErrorColorToElem = function($el) {
+		$el.add($el.find('*')).css({
+			color: 'rgb(191, 64, 64)' // Red @ 50% saturation
+		});
+	};
+
+	var linkPRViewWithRedmine = function(root) {
+		// get the pr source branch from the top of the page
+		var sourceTicket = extractTicketFromBranchName($('#pull-head .commit-ref').last());
+
+		if (doesNeedGlobalWarning(highlightCommitsInError(root, sourceTicket))) {
+			var commitTab = $('.tabnav-tabs.js-hard-tabs [data-container-id=commits_bucket]');
+			addErrorColorToElem(commitTab);
+		}
+	};
+
+	var linkBranchCompareWithRedmine = function(root) {
+		// get the compare branch from the top of the page
+		var sourceTicket = extractTicketFromBranchName($('#js-repo-pjax-container .branch-name').last().text().trim());
+
+		if (doesNeedGlobalWarning(highlightCommitsInError(root, sourceTicket))) {
+			var summaryList = $('.numbers-summary');
+			addErrorColorToElem(summaryList);
 		}
 	};
 
@@ -151,12 +176,20 @@
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkUpTheBranchNames);
 			}
 		}, {
-			'regex': /^\/dev\/freshapp\/pull\/(\d+)/,
+			'regex': /^\/dev\/(freshapp|evolve)\/pull\/(\d+)/,
 			'msg': 'View Pull Request',
 			'func': function() {
 				linkPRViewWithRedmine();
 
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkPRViewWithRedmine);
+			}
+		}, {
+			'regex': /^\/dev\/(freshapp|evolve)\/compare\/.*/,
+			'msg': 'Compare Branch',
+			'func': function() {
+				linkBranchCompareWithRedmine();
+
+				listenToChanges(document.getElementById('js-repo-pjax-container'), linkBranchCompareWithRedmine);
 			}
 		}];
 
