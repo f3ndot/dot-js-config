@@ -164,6 +164,60 @@
 		});
 	};
 
+	var highlightDiffExplain = function(root) {
+		var elems = $('#diff .explain, #diff .explain *', root).not('a'),
+			text = elems.text(),
+			regex = /(\d+) changed files(\d+) additions(\d+) deletions/,
+			matches = text.match(regex);
+		if (matches.length != 4) {
+			console.log("Couldn't find the Diff Explain section to highlight long PR's");
+			return;
+		}
+
+		var files = parseInt(matches[1], 10),
+			additions = parseInt(matches[2], 10),
+			deletions = parseInt(matches[3], 10),
+			totalLines = additions + deletions;
+
+		colorElementIfTooManyLinesChanges(elems, totalLines);
+	};
+
+	var highlightPullHeadLinesChanges = function(root) {
+		var elem = $('.pull-head-meta .diffstat'),
+			linesChanged = parseInt(elem.text(), 10);
+
+		console.log(elem, linesChanged);
+		colorElementIfTooManyLinesChanges(elem, linesChanged, {invert: true});
+	}
+
+	var colorElementIfTooManyLinesChanges = function($el, totalLines, options) {
+		options = options || {
+			invert: false
+		};
+
+		var red = 'rgb(191, 64, 64)', // Red @ 50% saturation
+			orange = 'rgb(193, 143, 68)',  // Orange @ 50% saturation
+			white = 'white';
+			color = null;
+
+		if (totalLines > 1000) {
+			color = red;
+		} else if (totalLines > 800) {
+			color = orange;
+		}
+
+		if (options.invert) {
+			$el.css({
+				background: color,
+				color: white
+			});
+		} else {
+			$el.css({
+				color: color
+			});
+		}
+	};
+
 	$(document).ready(function() {
 		var urlMapping = [{
 			'regex': '.*',
@@ -180,16 +234,22 @@
 			'msg': 'View Pull Request',
 			'func': function() {
 				linkPRViewWithRedmine();
+				highlightDiffExplain();
+				highlightPullHeadLinesChanges();
 
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkPRViewWithRedmine);
+				listenToChanges(document.getElementById('js-repo-pjax-container'), highlightDiffExplain);
+				listenToChanges(document.getElementById('js-repo-pjax-container'), highlightPullHeadLinesChanges);
 			}
 		}, {
 			'regex': /^\/dev\/([a-zA-Z\-]+)\/compare\/.*/,
 			'msg': 'Compare Branch',
 			'func': function() {
 				linkBranchCompareWithRedmine();
+				highlightDiffExplain();
 
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkBranchCompareWithRedmine);
+				listenToChanges(document.getElementById('js-repo-pjax-container'), highlightDiffExplain);
 			}
 		}];
 
