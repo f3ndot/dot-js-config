@@ -176,7 +176,7 @@
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkUpTheBranchNames);
 			}
 		}, {
-			'regex': /^\/dev\/(freshapp|evolve)\/pull\/(\d+)/,
+			'regex': /^\/dev\/([a-zA-Z\-]+)\/pull\/(\d+)/,
 			'msg': 'View Pull Request',
 			'func': function() {
 				linkPRViewWithRedmine();
@@ -184,7 +184,7 @@
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkPRViewWithRedmine);
 			}
 		}, {
-			'regex': /^\/dev\/(freshapp|evolve)\/compare\/.*/,
+			'regex': /^\/dev\/([a-zA-Z\-]+)\/compare\/.*/,
 			'msg': 'Compare Branch',
 			'func': function() {
 				linkBranchCompareWithRedmine();
