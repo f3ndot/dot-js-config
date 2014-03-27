@@ -185,12 +185,11 @@
 	};
 
 	var highlightPullHeadLinesChanges = function(root) {
-		var elem = $('.pull-head-meta .diffstat'),
-			linesChanged = parseInt(elem.text(), 10);
+		var elem = $('.pull-head-meta .diffstat', root),
+			linesChanged = parseInt(elem.text().replace(',', ''), 10);
 
-		console.log(elem, linesChanged);
 		colorElementIfTooManyLinesChanges(elem, linesChanged, {invert: true});
-	}
+	};
 
 	var colorElementIfTooManyLinesChanges = function($el, totalLines, options) {
 		options = options || {
