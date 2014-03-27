@@ -188,17 +188,12 @@
 		var elem = $('.pull-head-meta .diffstat', root),
 			linesChanged = parseInt(elem.text().replace(',', ''), 10);
 
-		colorElementIfTooManyLinesChanges(elem, linesChanged, {invert: true});
+		colorElementIfTooManyLinesChanges(elem, linesChanged);
 	};
 
-	var colorElementIfTooManyLinesChanges = function($el, totalLines, options) {
-		options = options || {
-			invert: false
-		};
-
+	var colorElementIfTooManyLinesChanges = function($el, totalLines) {
 		var red = 'rgb(191, 64, 64)', // Red @ 50% saturation
 			orange = 'rgb(193, 143, 68)',  // Orange @ 50% saturation
-			white = 'white',
 			color = null;
 
 		if (totalLines > 1000) {
@@ -207,16 +202,9 @@
 			color = orange;
 		}
 
-		if (options.invert) {
-			$el.css({
-				background: color,
-				color: white
-			});
-		} else {
-			$el.css({
-				color: color
-			});
-		}
+		$el.css({
+			color: color
+		});
 	};
 
 	$(document).ready(function() {
