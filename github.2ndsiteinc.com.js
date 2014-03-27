@@ -162,6 +162,8 @@
 			childList: true,
 			attributes: false
 		});
+
+		whatHappens();
 	};
 
 	var highlightDiffExplain = function(root) {
@@ -224,7 +226,6 @@
 			'msg': 'Any Page',
 			'func': function() {
 				includeSexyStyles();
-				linkUpTheBranchNames();
 
 				// this is the main body that contains the PR 'tab' (list and item views)
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkUpTheBranchNames);
@@ -233,10 +234,6 @@
 			'regex': /^\/dev\/([a-zA-Z\-]+)\/pull\/(\d+)/,
 			'msg': 'View Pull Request',
 			'func': function() {
-				linkPRViewWithRedmine();
-				highlightDiffExplain();
-				highlightPullHeadLinesChanges();
-
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkPRViewWithRedmine);
 				listenToChanges(document.getElementById('js-repo-pjax-container'), highlightDiffExplain);
 				listenToChanges(document.getElementById('js-repo-pjax-container'), highlightPullHeadLinesChanges);
@@ -245,9 +242,6 @@
 			'regex': /^\/dev\/([a-zA-Z\-]+)\/compare\/.*/,
 			'msg': 'Compare Branch',
 			'func': function() {
-				linkBranchCompareWithRedmine();
-				highlightDiffExplain();
-
 				listenToChanges(document.getElementById('js-repo-pjax-container'), linkBranchCompareWithRedmine);
 				listenToChanges(document.getElementById('js-repo-pjax-container'), highlightDiffExplain);
 			}
