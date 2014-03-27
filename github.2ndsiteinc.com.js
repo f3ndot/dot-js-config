@@ -199,7 +199,7 @@
 
 		var red = 'rgb(191, 64, 64)', // Red @ 50% saturation
 			orange = 'rgb(193, 143, 68)',  // Orange @ 50% saturation
-			white = 'white';
+			white = 'white',
 			color = null;
 
 		if (totalLines > 1000) {
