@@ -25,8 +25,9 @@
 
 	var extractTicketBuilder = function(regex) {
 		return function($el) {
-			var text = (typeof($el) == 'string' ? $el : $el.text().trim()),
-				matches = text.match(regex);
+			var text = (typeof($el) == 'string' ? $el : $el.text());
+			text = text.trim().replace("...\n\n...", '');
+			var matches = text.match(regex);
 
 			if (matches && matches.length == 3 && matches[2]) {
 				return matches[2];
